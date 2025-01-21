@@ -26,8 +26,9 @@ spec:
         targetRevision: v0.2.4
         helm:
           valuesObject:
+            cluster:
+              location: "westus3"
             subscriptionID: '{{metadata.annotations.subscription_id}}'
-            location: "westus3"
             identity:
               clientID: '{{metadata.annotations.akspe_identity_id}}'
               tenantID: '{{metadata.annotations.tenant_id}}'
