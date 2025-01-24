@@ -5,6 +5,7 @@ manager:
   featureGates:
     core:
       ClusterTopology: true
+      MachinePool: true
 additionalDeployments:
   azureserviceoperator-controller-manager:
     deployment:

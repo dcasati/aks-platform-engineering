@@ -57,7 +57,7 @@ Choose Crossplane **or** Cluster API provider for Azure (CAPZ) to support deploy
     - Create a [read-only deploy ssh key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) on the fork
     - Place the corresponding private key named `private_ssh_deploy_key` in the `terraform` directory
     - Change the `gitops_addons_org` variable to `git@github.com:Azure-Samples` replacing Azure-Samples with your fork org/username versus the existing `https://` format
-    - Uncomment line 218 of the `main.tf` file: `# sshPrivateKey = file(pathexpand(var.git_private_ssh_key))`
+    - Uncomment line 489 of the `main.tf` file: `# sshPrivateKey = file(pathexpand(var.git_private_ssh_key))`
 
 Run Terraform:
 
@@ -131,7 +131,7 @@ The following steps will install CAPZ via the Cluster-API operator which also in
 ```shell
 helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
 helm repo update
-helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system --wait --timeout 90s -f gitops/environments/default/addons/cluster-api-provider-azure/values.yaml
+helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system --wait --timeout 300s -f ../gitops/environments/default/addons/cluster-api-provider-azure/values.yaml
 ``` 
 
 In order to install CAPI Operator with additional CRDs, `helm install` must use a `values.yaml` file since the commands cannot be passed on the command line.  documentdb and managedidentity CRDS are added by default in the provided [values.yaml file](./gitops/environments/default/addons/cluster-api-provider-azure/values.yaml) and can be optionally customized if desired.  For more information read the first section of [CAPZ versus Crossplane](./docs/capz-or-crossplane.md#cluster-api-provider-for-azure-capz-and-azure-service-operator-aso).
@@ -149,7 +149,7 @@ capz-controller-manager-ff97799dd-8l5n2                   1/1     Running   0   
 ```
 Now apply the credentials for CAPZ to be able to create resources using the Workload Identity created by Terraform.
 
-Add in the `clientID:` and `tenantID:` values from the `terraform apply` matching output values to the `gitops/hooks/identity/identity.yaml` file. Feel free to run `terraform apply` again if needed to get these output values.  Then apply the identity to the cluster.
+Add in the `clientID:` and `tenantID:` values from the `terraform output` matching output values to the `gitops/hooks/identity/identity.yaml` file. Feel free to run `terraform output` again if needed to get these output values.  Then apply the identity to the cluster.
 
 ```shell
 kubectl apply -f ../gitops/hooks/identity/identity.yaml

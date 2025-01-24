@@ -107,32 +107,37 @@ module "network" {
 ################################################################################
 # Postgres: Module
 ################################################################################
-resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
+resource "azurerm_postgresql_server" "backstagedbserver" {
   count = local.build_backstage ? 1 : 0
-  name                = "backstage-postgresql-server"
+  name                = "backstage-gbb-server"
   location            = var.location
   public_network_access_enabled = true
-  administrator_password = var.postgres_password
   resource_group_name = azurerm_resource_group.this.name
-  administrator_login = "psqladminun"
-  sku_name = "GP_Standard_D4s_v3"
-  version = "12"
-  zone = 1
+  administrator_login = "psqladminun@backstage-gbb-server"
+  administrator_login_password = var.postgres_password
+  sku_name = "GP_Gen5_4"
+  version = "10.0"
+  
+  # enable ssl
+  ssl_enforcement_enabled          = true
+  ssl_minimal_tls_version_enforced = "TLS1_2"
 }
 
 # Define the PostgreSQL database
-resource "azurerm_postgresql_flexible_server_database" "backstage_plugin_catalog" {
+resource "azurerm_postgresql_database" "backstage_plugin_catalog" {
   count = local.build_backstage ? 1 : 0
   name                = "backstage_plugin_catalog"
-  server_id         = azurerm_postgresql_flexible_server.backstagedbserver[count.index].id
+  resource_group_name = azurerm_resource_group.this.name
+  server_name = azurerm_postgresql_server.backstagedbserver[count.index].name
   charset             = "UTF8"
   collation = "en_US.utf8"
 }
 
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all" {
+resource "azurerm_postgresql_firewall_rule" "allow_all" {
   count = local.build_backstage ? 1 : 0
   name                = "AllowAll"
-  server_id = azurerm_postgresql_flexible_server.backstagedbserver[count.index].id
+  resource_group_name = azurerm_resource_group.this.name
+  server_name         = azurerm_postgresql_server.backstagedbserver[count.index].name
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
 }
@@ -486,7 +491,7 @@ resource "kubernetes_secret" "git_secrets" {
     git-addons = {
       type          = "git"
       url           = var.gitops_addons_org
-      # sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
+      sshPrivateKey = file(pathexpand(var.git_private_ssh_key))
     }
   }
   metadata {
@@ -556,7 +561,7 @@ resource "helm_release" "backstage" {
   repository = "oci://oowcontainerimages.azurecr.io/helm"
   chart      = "backstagechart"
   version    = "0.1.0"
-
+  timeout = 30000
   set {
     name  = "image.repository"
     value = "oowcontainerimages.azurecr.io/backstage"
@@ -615,7 +620,7 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "env.POSTGRES_HOST"
-    value = azurerm_postgresql_flexible_server.backstagedbserver[count.index].fqdn
+    value = azurerm_postgresql_server.backstagedbserver[count.index].fqdn
   }
 
   set {
@@ -625,17 +630,17 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "env.POSTGRES_USER"
-    value = azurerm_postgresql_flexible_server.backstagedbserver[count.index].administrator_login
+    value = azurerm_postgresql_server.backstagedbserver[count.index].administrator_login
   }
 
   set {
     name  = "env.POSTGRES_PASSWORD"
-    value = azurerm_postgresql_flexible_server.backstagedbserver[count.index].administrator_password
+    value = azurerm_postgresql_server.backstagedbserver[count.index].administrator_login_password
   }
 
   set {
     name  = "env.POSTGRES_DB"
-    value = azurerm_postgresql_flexible_server_database.backstage_plugin_catalog[count.index].name
+    value = azurerm_postgresql_database.backstage_plugin_catalog[count.index].name
   }
 
   set {
