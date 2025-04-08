@@ -98,3 +98,6 @@ aks-pe-ssh.pub
 aks-pe-ssh
 terraform/tls.key
 terraform/tls.key
+gitops/hooks/identity/identity.generated.yaml
+terraform/tfvars
+terraform/tfvars
