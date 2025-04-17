@@ -37,7 +37,8 @@ spec:
               kubernetes_version: "1.30.10"
               networkPluginMode: "overlay"
               ## Optional SSH public key data (must be valid)
-              sshPublicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWoFnKLt4OCakP3ueHbdN4FHc2LghjVT/sbg+9IHBKdEzmVZMuMiSEI70LKrT/PTsfEysA7Eq1Ru9WSY9sh1uwQr8v7G5jQDOAz898mbq8Abap9AMV2cfSYxJ3S1y6y1ZTlK0kzz/fsredTQq9tYCxbZP+wBafSiIs0NYN+SSOhoZYBuRHH8i+OdJz2QRXM/K/T9mypbynSfDF8KcJOhcp2XtZG3nEn8faxuoAprTydjXyU02ssIjRgOW+3++LcC61Bsn4N0O9wLKlpbLoO8FsooWJw4Dleo6+uQMHUiacrPbpZGwoRhgzXQNivk89on0ruV4jr9c//tRw640dcdKGJo3fjd+dfNeZe9AUPY6L2nQz6o5OL61A/mIIve9a8PCJ/MKfTdw0txvbEHN4Odq3zx22bU3RFGuxnUTRmvOl/T2Uw9nyD6lPPEwlNfFvGL6bu9UEsOwkhvg4aF/0onAu93qYBUNTrQHrXJXm7GyuUClWQ2Btiwx+8cH/XYhZw4zbtpaWKhtMDwRxvfBzmvLPyUp6ph4GWg//ySHlPzh7CvR68wGMThZvtioF0jHpEw9wAxzdGY/zQwBMgcUVJT6QmzLtddngWEDexc4Ydg7FPSUPPsJglEnW62CowFS8UNwJKY7RIwbJ8j9NHpWyFXDSRw187kTLx84cnr+AMnKA2Q== dcasati@WIN-THINK24'
+              ## only needed if you want access to the workload cluster VMs
+              # sshPublicKey:
             defaults:
               agentPool:
                 sku: Standard_D8ds_v5
